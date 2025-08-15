@@ -147,6 +147,10 @@
             </div>
         </div>
     </div>
+    <!-- Clear Button -->
+<div style="display:flex; gap:12px; align-items:center; margin-top:12px;">
+    <button class="clear" onclick="clearAttendance()">Clear Attendance</button>
+</div>
 
     <script>
         // Sample student database
@@ -164,6 +168,7 @@
             "SAN25016": { name: "Satyam Kumar", class: "9", phone: "9472094162" },
             "SAN25012": { name: "Krish Raj", class: "9", phone: "9304998868" },
             "SAN25011": { name: "Manvi", class: "9", phone: "8989972932" },
+            "SAN25015": { name: "Bharat Kumar Adarsh", class: "9", phone: "9122609590" },
             "SAN25010": { name: "Tripti Kumari", class: "9", phone: "8789832449" },
             "SAN25013": { name: "Anamika", class: "9", phone: "9508400448" },
             "SAN25014": { name: "Saumya Chauhan", class: "9", phone: "6205053029" },
@@ -275,6 +280,23 @@ function onScanSuccess(decodedText) {
         document.getElementById("attendance-status").innerText = "";
     }
 }
+ // ...existing JS above...
+
+    function clearAttendance() {
+        attendance = {};
+        localStorage.removeItem("attendance");
+        updateTable();
+        document.getElementById("student-name").innerText = "";
+        document.getElementById("attendance-status").innerText = "";
+    }
+
+    // Auto save after 20 minutes (1200000 ms)
+    setTimeout(() => {
+        localStorage.setItem("attendance", JSON.stringify(attendance));
+        alert("Attendance list has been auto-saved.");
+    }, 1200000);
+
+    // ...existing JS below...
     </script>
 
 <audio id="scan-sound" src="success-221935.mp3" preload="auto"></audio>
