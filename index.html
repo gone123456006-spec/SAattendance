@@ -3,70 +3,173 @@
 <head>
     <title>QR Attendance App</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #1babf4;
-            padding: 20px;
-            margin: auto;
-            
-        }
+    <!-- Improved, modern font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background-color: navy;
+        padding: 20px;
+        margin: 0;
+        color: white;
+    }
+
+    /* QR Scanner Box */
+    #reader {
+        width: 90%;
+        max-width: 400px;
+        aspect-ratio: 1 / 1; /* Keeps it square */
+        margin: 20px auto;
+        border: 5px solid white;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* Green Glow when success */
+    #reader.success {
+        border-color: limegreen;
+        box-shadow: 0 0 25px rgb(7, 208, 7);
+    }
+
+    /* Present Text */
+    .present {
+        color: rgb(8, 17, 125);
+        font-weight: bold;
+    }
+
+    /* Table */
+    table {
+        margin: auto;
+        border-collapse: collapse;
+        width: 95%;
+        max-width: 800px;
+        background-color: white;
+        color: black;
+    }
+    th, td {
+        padding: 8px;
+        border: 1px solid #ccc;
+        text-align: center;
+        font-size: 0.9rem;
+    }
+    th {
+        background-color: black;
+        color: white;
+    }
+
+    /* Buttons */
+    button {
+        background-color: rgb(78, 109, 235);
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin: 5px;
+    }
+    button:hover {
+        background-color: rgb(255, 3, 3);
+    }
+    h2 {
+        color: rgb(0, 0, 0);
+        margin: 10px 0;
+    }
+
+    /* Responsive Tweaks */
+    @media (max-width: 600px) {
         #reader {
-            width: 300px;
-            margin: auto;
-        }
-        .present {
-            color: green;
-            font-weight: bold;
-        }
-        table {
-            margin: auto;
-            border-collapse: collapse;
-            width: 80%;
+            max-width: 300px;
         }
         th, td {
-            padding: 8px;
-            border: 1px solid #ccc;
+            font-size: 0.8rem;
+            padding: 6px;
         }
-    </style>
+        button {
+            font-size: 14px;
+            padding: 8px 16px;
+        }
+    }
+</style>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <h1> Attendance App</h1>
-    <div>
-    <a href="generator.html"> QR Code Generator</a>
-    </div>
-    <div id="reader"></div>
-    <h2 id="student-name"></h2>
-    <p id="attendance-status"></p>
+    <div class="app">
+        <header>
+            <div class="brand">
+                <div class="logo">S</div>
+                <div>
+                    <h1> Saamarthya Academy </h1>
+                </div>
+            </div>
+            <div class="actions">
+                <a class="gen" href="generator.html">QR Code Generator</a>
+            </div>
+        </header>
 
-    <h2>Attendance List</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Student ID</th>
-                <th>Name</th>
-                <th>Class</th>
-                <th>Status</th>
-                <th>Date & Time</th>
-            </tr>
-        </thead>
-        <tbody id="attendance-table"></tbody>
-    </table>
-    <br>
-    <button onclick="downloadCSV()">Download Attendance CSV</button>
+        <div class="grid">
+            <div class="reader-card">
+                <div id="reader">
+                    <div class="scan-overlay"><div class="scan-line"></div></div>
+                </div>
+
+                <div class="camera-controls">
+                    <button class="btn" id="switch-camera">Switch Camera</button>
+                </div>
+
+                <div class="details">
+                    <h2 id="student-name"></h2>
+                    <p id="attendance-status"></p>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <h2 style="margin-bottom:8px;">Attendance List</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Name</th>
+                            <th>Class</th>
+                            <th>Status</th>
+                            <th>Date & Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendance-table"></tbody>
+                </table>
+
+                <div style="display:flex; gap:12px; align-items:center; margin-top:12px;">
+                    <button class="download" onclick="downloadCSV()">Download Attendance CSV</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         // Sample student database
         const students = {
-            "101": { name: "John Doe", class: "10A", phone: "9876543210" },
-            "102": { name: "Jane Smith", class: "10B", phone: "9876543211" },
-            "103": { name: "Ravi Kumar", class: "9A", phone: "9876543212" },
-            "106": { name: "Vishwajeet Kumar", class: "12A", phone: "9876543212" },
-            "SAT25001": { name: "Shyam Kumar", class: "12", phone: "8974668938" },
-            "SAT25002": { name: "Neelu Kumari", class: "12", phone: "8974668938" }
+            "SAH25001": { name: "Aditya Raj", class: "8", phone: "6206971640" },
+            "SAH25010": { name: "Shreyansh Kumar", class: "8", phone: "8340135190" },
+            "SAH25011": { name: "Aayush Kant", class: "8", phone: "7321852484" },
+
+            "SAJ25013": { name: "Kritika Arya", class: "X", phone: "7870454422" },
+            "SAJ25012": { name: "Shweta Kumari", class: "X", phone: "8873238428" },
+            "SAJ25011": { name: "Divyanshu Kumar", class: "X", phone: "8789580780" },
+            "SAJ25016": { name: "Arnav", class: "X", phone: "9934490207" },
+            "SAJ25015": { name: "Dhruv Ranjan", class: "X", phone: "7979709595" },
+            "SAJ25014": { name: "Sonali Kumari", class: "X", phone: "8862991979" },
+            "SAN25008": { name: "aSHUTOSH Raj", class: "9", phone: "9905606885" },
+            "SAN25016": { name: "Satyam Kumar", class: "9", phone: "9472094162" },
+            "SAN25012": { name: "Krish Raj", class: "9", phone: "9304998868" },
+            "SAN25011": { name: "Manvi", class: "9", phone: "8989972932" },
+            "SAN25010": { name: "Tripit Kumari", class: "9", phone: "8789832449" },
+            "SAN25013": { name: "Anamika", class: "9", phone: "9508400448" },
+            "SAN25014": { name: "Saumya", class: "9", phone: "6205053029" },
+            "SAN25017": { name: "Kumari Kamya", class: "9", phone: "6204020655" }
+
         };
 
         // Load previous attendance
@@ -103,7 +206,7 @@
                 localStorage.setItem("attendance", JSON.stringify(attendance));
 
                 document.getElementById("student-name").innerText = `${student.name} (${student.class})`;
-                document.getElementById("attendance-status").innerHTML = `<span class="present">Present ✅ at ${time}</span>`;
+                document.getElementById("attendance-status").innerHTML = `<span class="status-badge">Present ✅ at ${time}</span>`;
 
                 updateTable();
             } else {
@@ -118,6 +221,23 @@
             "reader", { fps: 10, qrbox: 250 });
         html5QrcodeScanner.render(onScanSuccess, onScanError);
 
+        // wire switch camera button (fallback safe)
+        document.getElementById('switch-camera').addEventListener('click', () => {
+            Html5Qrcode.getCameras().then(cameras => {
+                if (cameras && cameras.length > 1) {
+                    const current = cameras[0];
+                    // try to pick the other camera if available
+                    const other = cameras.find(c => c.id !== current.id) || cameras[0];
+                    // restart scanner with the other camera
+                    html5QrcodeScanner.clear().then(() => {
+                        const reader = new Html5Qrcode('reader');
+                        reader.start(other.id, { fps: 15, qrbox: 250 }, onScanSuccess, onScanError)
+                            .catch(err => console.warn('Could not start camera', err));
+                    });
+                }
+            }).catch(err => console.warn(err));
+        });
+
         function downloadCSV() {
             let csv = "Student ID,Name,Class,Status,Date & Time\n";
             for (let id in attendance) {
@@ -130,11 +250,14 @@
             link.download = "attendance.csv";
             link.click();
         }
-
-        updateTable();
+            updateTable();
     </script>
 
 </body>
 </html>
+
+
+
+
 
 
