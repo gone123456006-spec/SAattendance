@@ -151,10 +151,9 @@
     <script>
         // Sample student database
         const students = {
-            "SAH25001": { name: "Aditya Raj", class: "8", phone: "6206971640" },
+            "SAH25009": { name: "Aditya Raj", class: "8", phone: "6206971640" },
             "SAH25010": { name: "Shreyansh Kumar", class: "8", phone: "8340135190" },
             "SAH25011": { name: "Aayush Kant", class: "8", phone: "7321852484" },
-
             "SAJ25013": { name: "Kritika Arya", class: "10", phone: "7870454422" },
             "SAJ25012": { name: "Shweta Kumari", class: "10", phone: "8873238428" },
             "SAJ25011": { name: "Divyanshu Kumar", class: "10", phone: "8789580780" },
@@ -251,7 +250,34 @@
             link.click();
         }
             updateTable();
+function onScanSuccess(decodedText) {
+    if (students[decodedText]) {
+        // Play scan success sound
+        document.getElementById("scan-sound").play();
+
+        let student = students[decodedText];
+        let now = new Date();
+        let time = now.toLocaleString();
+        attendance[decodedText] = {
+            name: student.name,
+            class: student.class,
+            status: "Present ✅",
+            time: time
+        };
+        localStorage.setItem("attendance", JSON.stringify(attendance));
+
+        document.getElementById("student-name").innerText = `${student.name} (${student.class})`;
+        document.getElementById("attendance-status").innerHTML = `<span class="status-badge">Present ✅ at ${time}</span>`;
+
+        updateTable();
+    } else {
+        document.getElementById("student-name").innerText = "Unknown QR Code";
+        document.getElementById("attendance-status").innerText = "";
+    }
+}
     </script>
+
+<audio id="scan-sound" src="success-221935.mp3" preload="auto"></audio>
 
 </body>
 </html>
