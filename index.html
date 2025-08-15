@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QR Attendance App</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #1babf4;
+            padding: 20px;
+            margin: auto;
+            
+        }
+        #reader {
+            width: 300px;
+            margin: auto;
+        }
+        .present {
+            color: green;
+            font-weight: bold;
+        }
+        table {
+            margin: auto;
+            border-collapse: collapse;
+            width: 80%;
+        }
+        th, td {
+            padding: 8px;
+            border: 1px solid #ccc;
+        }
+    </style>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1> Attendance App</h1>
+    <div>
+    <a href="generator.html"> QR Code Generator</a>
+    </div>
+    <div id="reader"></div>
+    <h2 id="student-name"></h2>
+    <p id="attendance-status"></p>
+
+    <h2>Attendance List</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Student ID</th>
+                <th>Name</th>
+                <th>Class</th>
+                <th>Status</th>
+                <th>Date & Time</th>
+            </tr>
+        </thead>
+        <tbody id="attendance-table"></tbody>
+    </table>
+    <br>
+    <button onclick="downloadCSV()">Download Attendance CSV</button>
+
+    <script>
+        // Sample student database
+        const students = {
+            "101": { name: "John Doe", class: "10A", phone: "9876543210" },
+            "102": { name: "Jane Smith", class: "10B", phone: "9876543211" },
+            "103": { name: "Ravi Kumar", class: "9A", phone: "9876543212" },
+            "106": { name: "Vishwajeet Kumar", class: "12A", phone: "9876543212" },
+            "SAT25001": { name: "Shyam Kumar", class: "12", phone: "8974668938" },
+            "SAT25002": { name: "Neelu Kumari", class: "12", phone: "8974668938" }
+        };
+
+        // Load previous attendance
+        let attendance = JSON.parse(localStorage.getItem("attendance")) || {};
+
+        function updateTable() {
+            let tbody = document.getElementById("attendance-table");
+            tbody.innerHTML = "";
+            for (let id in attendance) {
+                let row = attendance[id];
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${id}</td>
+                        <td>${row.name}</td>
+                        <td>${row.class}</td>
+                        <td>${row.status}</td>
+                        <td>${row.time}</td>
+                    </tr>
+                `;
+            }
+        }
+
+        function onScanSuccess(decodedText) {
+            if (students[decodedText]) {
+                let student = students[decodedText];
+                let now = new Date();
+                let time = now.toLocaleString();
+                attendance[decodedText] = {
+                    name: student.name,
+                    class: student.class,
+                    status: "Present ✅",
+                    time: time
+                };
+                localStorage.setItem("attendance", JSON.stringify(attendance));
+
+                document.getElementById("student-name").innerText = `${student.name} (${student.class})`;
+                document.getElementById("attendance-status").innerHTML = `<span class="present">Present ✅ at ${time}</span>`;
+
+                updateTable();
+            } else {
+                document.getElementById("student-name").innerText = "Unknown QR Code";
+                document.getElementById("attendance-status").innerText = "";
+            }
+        }
+
+        function onScanError(errorMessage) {}
+
+        let html5QrcodeScanner = new Html5QrcodeScanner(
+            "reader", { fps: 10, qrbox: 250 });
+        html5QrcodeScanner.render(onScanSuccess, onScanError);
+
+        function downloadCSV() {
+            let csv = "Student ID,Name,Class,Status,Date & Time\n";
+            for (let id in attendance) {
+                let row = attendance[id];
+                csv += `${id},${row.name},${row.class},${row.status},${row.time}\n`;
+            }
+            let blob = new Blob([csv], { type: 'text/csv' });
+            let link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "attendance.csv";
+            link.click();
+        }
+
+        updateTable();
+    </script>
+
+</body>
+</html>
+
+
