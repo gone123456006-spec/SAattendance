@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QR Code Generator</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <style>
+        body { font-family: Arial; text-align: center; background: #f4f4f4; padding: 20px; }
+        input { padding: 10px; margin: 10px; }
+        button { padding: 10px; }
+        #qrcode { margin-top: 20px; }
+        canvas { border: 1px solid #ccc; }
+        div a {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #c71818;
+            border-radius: 5px;
+            background: white;
+            text-decoration: none;
+            text-align: center;
+        }
+        div a:hover {
+            background: #c71818;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🎯 Student QR Code Generator</h1>
+    <div>
+        <a href="index.html">Go to Attendance</a>
+    </div>
+    <br><br>
+    <input type="text" id="student-id" placeholder="Enter Student ID">
+    <button onclick="generateQR()">Generate QR</button>
+    <div id="qrcode"></div>
+
+    <script>
+        function generateQR() {
+            let id = document.getElementById("student-id").value;
+            if (id.trim() === "") return alert("Enter a Student ID");
+            document.getElementById("qrcode").innerHTML = "";
+            QRCode.toCanvas(document.createElement('canvas'), id, function (err, canvas) {
+                if (err) throw err;
+                document.getElementById("qrcode").appendChild(canvas);
+            });
+        }
+    </script>
+
+</body>
+</html>

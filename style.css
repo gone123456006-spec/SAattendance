@@ -1,0 +1,53 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f7f7f7;
+    text-align: center;
+    padding: 20px;
+    margin: auto;
+}
+
+h1 {
+    color: #e9493e;
+}
+
+#reader {
+    margin: auto;
+    width: 350px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    background: white;
+}
+
+.present {
+    color: green;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.absent {
+    color: red;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+#student-info {
+    margin-top: 20px;
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 5px rgba(0,0,0,0.1);
+}
+
+div a {
+    color: #3e88e9;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition:background 0.3s;
+}
+
+div a:hover {
+    background: #3e88e9;
+    color: white;
+}
