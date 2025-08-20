@@ -592,3 +592,19 @@ document.addEventListener("DOMContentLoaded", () => {
   }, 60 * 60 * 1000);
 });
 
+const video = document.getElementById("preview");
+
+if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+  navigator.mediaDevices.getUserMedia({
+    video: { facingMode: "environment" } // back camera
+  })
+  .then(stream => {
+    video.srcObject = stream;
+  })
+  .catch(err => {
+    alert("Camera access denied or not available: " + err);
+  });
+} else {
+  alert("Camera not supported in this browser.");
+}
+
