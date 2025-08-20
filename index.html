@@ -1,310 +1,131 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>QR Attendance App</title>
-    <script src="https://unpkg.com/html5-qrcode"></script>
-    <!-- Improved, modern font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        text-align: center;
-        background-color: navy;
-        padding: 20px;
-        margin: 0;
-        color: rgb(236, 94, 51);
-    }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Attendance App - Saamarthya Academy</title>
 
-    /* QR Scanner Box */
-    #reader {
-        width: 90%;
-        max-width: 400px;
-        aspect-ratio: 1 / 1; /* Keeps it square */
-        margin: 20px auto;
-        border: 5px solid white;
-        border-radius: 15px;
-        box-shadow: 0 0 20px rgba(0,0,0,0.5);
-        transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }
+  <!-- External Libraries -->
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    /* Green Glow when success */
-    #reader.success {
-        border-color: limegreen;
-        box-shadow: 0 0 25px rgb(7, 208, 7);
-    }
+  <!-- Fonts & Styles -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="AI.css">
 
-    /* Present Text */
-    .present {
-        color: rgb(8, 17, 125);
-        font-weight: bold;
+  <style>
+    #dashboard { font-weight: 600; font-size: 18px; margin-bottom: 12px; }
+    .status-badge { font-weight: 600; }
+    .reader-card, .table-wrap {
+      padding: 16px; border-radius: 12px; background: #f9f9f9;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
-
-    /* Table */
-    table {
-        margin: auto;
-        border-collapse: collapse;
-        width: 95%;
-        max-width: 800px;
-        background-color: white;
-        color: black;
-    }
-    th, td {
-        padding: 8px;
-        border: 1px solid #ccc;
-        text-align: center;
-        font-size: 0.9rem;
-    }
-    th {
-        background-color: black;
-        color: white;
-    }
-
-    /* Buttons */
-    button {
-        background-color: rgb(78, 109, 235);
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-        margin: 5px;
-    }
-    button:hover {
-        background-color: rgb(255, 3, 3);
-    }
-    h2 {
-        color: rgb(0, 0, 0);
-        margin: 10px 0;
-    }
-
-    /* Responsive Tweaks */
-    @media (max-width: 600px) {
-        #reader {
-            max-width: 300px;
-        }
-        th, td {
-            font-size: 0.8rem;
-            padding: 6px;
-        }
-        button {
-            font-size: 14px;
-            padding: 8px 16px;
-        }
-    }
-</style>
-    <link rel="stylesheet" href="style.css">
+  </style>
 </head>
 <body>
 
-    <div class="app">
-        <header>
-            <div class="brand">
-                <div class="logo">S</div>
-                <div>
-                    <h1> Saamarthya Academy </h1>
-                </div>
-            </div>
-            <div class="actions">
-                <a class="gen" href="generator.html">QR Code Generator</a>
-            </div>
-        </header>
+  <div class="app">
+    <!-- Header -->
+    <header>
+      <div class="brand">
+        <img src="LOGOOO.svg" height="100" width="100" alt="Logo">
+        <div><h1>Saamarthya Academy</h1></div>
+      </div>
+      <div class="actions" style="margin-top: 8px;">
+        <a class="gen" href="QR generator.html">QR Code Generator</a>
+      </div>
+      <br>
+      <br>
+      <div>
+       <a href="Montly.html" target="_blank">View Monthly Report</a>
+      </div>
+    </header>
+    <br><br>
 
-        <div class="grid">
-            <div class="reader-card">
-                <div id="reader">
-                    <div class="scan-overlay"><div class="scan-line"></div></div>
-                </div>
+    <!-- Dashboard -->
+    <div id="dashboard">Present: 0 / 0</div>
 
-                <div class="camera-controls">
-                    <button class="btn" id="switch-camera">Switch Camera</button>
-                </div>
-
-                <div class="details">
-                    <h2 id="student-name"></h2>
-                    <p id="attendance-status"></p>
-                </div>
-            </div>
-
-            <div class="table-wrap">
-                <h2 style="margin-bottom:8px;">Attendance List</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Student ID</th>
-                            <th>Name</th>
-                            <th>Class</th>
-                            <th>Status</th>
-                            <th>Date & Time</th>
-                        </tr>
-                    </thead>
-                    <tbody id="attendance-table"></tbody>
-                </table>
-
-                <div style="display:flex; gap:12px; align-items:center; margin-top:12px;">
-                    <button class="download" onclick="downloadCSV()">Download Attendance CSV</button>
-                </div>
-            </div>
+    <!-- Main grid -->
+    <div class="grid" style="display:flex; gap:24px; flex-wrap:wrap;">
+      <!-- QR Scanner Card -->
+      <div class="reader-card" style="flex:1; min-width:300px;">
+        <h2>Scan Student QR Code</h2>
+        <div id="reader" style="position:relative;">
+          <div class="scan-overlay"><div class="scan-line"></div></div>
         </div>
-    </div>
-    <!-- Clear Button -->
-<div style="display:flex; gap:12px; align-items:center; margin-top:12px;">
-    <button class="clear" onclick="clearAttendance()">Clear Attendance</button>
-</div>
+        <div class="camera-controls" style="margin-top:12px;">
+          <button class="btn" id="switch-camera">Switch Camera</button>
+        </div>
+        <div class="details" style="margin-top:20px;">
+          <h2 id="student-name"></h2>
+          <p id="attendance-status"></p>
+        </div>
+      </div>
 
-    <script>
-        // Sample student database
-        const students = {
-            "SAH25009": { name: "Aditya Raj", class: "8", phone: "6206971640" },
-            "SAH25010": { name: "Shreyansh Kumar", class: "8", phone: "8340135190" },
-            "SAH25011": { name: "Aayush Kant", class: "8", phone: "7321852484" },
-            "SAJ25013": { name: "Kritika Arya", class: "10", phone: "7870454422" },
-            "SAJ25012": { name: "Shweta Kumari", class: "10", phone: "8873238428" },
-            "SAJ25011": { name: "Divyanshu Kumar", class: "10", phone: "8789580780" },
-            "SAJ25016": { name: "Arnav", class: "10", phone: "9934490207" },
-            "SAJ25015": { name: "Dhruv Ranjan", class: "10", phone: "7979709595" },
-            "SAJ25014": { name: "Sonali Kumari", class: "10", phone: "8862991979" },
-            "SAN25008": { name: "Ashutosh Raj", class: "9", phone: "9905606885" },
-            "SAN25016": { name: "Satyam Kumar", class: "9", phone: "9472094162" },
-            "SAN25012": { name: "Krish Raj", class: "9", phone: "9304998868" },
-            "SAN25011": { name: "Manvi", class: "9", phone: "8989972932" },
-            "SAN25015": { name: "Bharat Kumar Adarsh", class: "9", phone: "9122609590" },
-            "SAN25010": { name: "Tripti Kumari", class: "9", phone: "8789832449" },
-            "SAN25013": { name: "Anamika", class: "9", phone: "9508400448" },
-            "SAN25014": { name: "Saumya Chauhan", class: "9", phone: "6205053029" },
-            "SAN25017": { name: "Kumari Kamya", class: "9", phone: "6204020655" }
+      <!-- Attendance Table -->
+      <div class="table-wrap" style="flex:1; min-width:400px;">
+        <h2>Attendance List</h2>
+        <table style="width:100%; border-collapse:collapse; margin-top:8px;">
+          <thead>
+            <tr>
+              <th>Student ID</th>
+              <th>Name</th>
+              <th>Class</th>
+              <th>Status</th>
+              <th>Date & Time</th>
+            </tr>
+          </thead>
+          <tbody id="attendance-table"></tbody>
+        </table>
 
-        };
+        <!-- Table Actions -->
+        <div style="display:flex; gap:12px; align-items:center; margin-top:12px;">
+          <select id="class-filter">
+            <option value="all">All Classes</option>
+            <option value="8">Class 8</option>
+            <option value="9">Class 9</option>
+            <option value="10">Class 10</option>
+            <option value="11">Class 11</option>
+            <option value="12">Class 12</option>
+          </select>
+          <button class="download" onclick="downloadCSV()">Download Attendance CSV</button>
+          <button class="clear" onclick="clearAttendance()">Clear Attendance</button>
+        </div>
 
-        // Load previous attendance
-        let attendance = JSON.parse(localStorage.getItem("attendance")) || {};
+        <!-- Dashboard Overview -->
+        <div class="dashboard-container">
+          <h2>📊 Dashboard Overview</h2>
+          <table class="dashboard-table">
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Total Students</th>
+                <th>Present</th>
+                <th>Active Classes</th>
+              </tr>
+            </thead>
+            <tbody> 
+              <tr>
+                <td><span id="status-badge" class="badge inactive">Inactive </span></td>
+                <td id="total-students">0</td>
+                <td><span id="present-count" class="badge count">0</span></td>
+                <td id="class-dashboard">No class active</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-        function updateTable() {
-            let tbody = document.getElementById("attendance-table");
-            tbody.innerHTML = "";
-            for (let id in attendance) {
-                let row = attendance[id];
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${id}</td>
-                        <td>${row.name}</td>
-                        <td>${row.class}</td>
-                        <td>${row.status}</td>
-                        <td>${row.time}</td>
-                    </tr>
-                `;
-            }
-        }
+        
+  <!-- Audio -->
+  <audio id="scan-sound" src="Tone.mp3" preload="auto" ></audio>
 
-        function onScanSuccess(decodedText) {
-            if (students[decodedText]) {
-                let student = students[decodedText];
-                let now = new Date();
-                let time = now.toLocaleString();
-                attendance[decodedText] = {
-                    name: student.name,
-                    class: student.class,
-                    status: "Present ✅",
-                    time: time
-                };
-                localStorage.setItem("attendance", JSON.stringify(attendance));
-
-                document.getElementById("student-name").innerText = `${student.name} (${student.class})`;
-                document.getElementById("attendance-status").innerHTML = `<span class="status-badge">Present ✅ at ${time}</span>`;
-
-                updateTable();
-            } else {
-                document.getElementById("student-name").innerText = "Unknown QR Code";
-                document.getElementById("attendance-status").innerText = "";
-            }
-        }
-
-        function onScanError(errorMessage) {}
-
-        let html5QrcodeScanner = new Html5QrcodeScanner(
-            "reader", { fps: 10, qrbox: 250 });
-        html5QrcodeScanner.render(onScanSuccess, onScanError);
-
-        // wire switch camera button (fallback safe)
-        document.getElementById('switch-camera').addEventListener('click', () => {
-            Html5Qrcode.getCameras().then(cameras => {
-                if (cameras && cameras.length > 1) {
-                    const current = cameras[0];
-                    // try to pick the other camera if available
-                    const other = cameras.find(c => c.id !== current.id) || cameras[0];
-                    // restart scanner with the other camera
-                    html5QrcodeScanner.clear().then(() => {
-                        const reader = new Html5Qrcode('reader');
-                        reader.start(other.id, { fps: 15, qrbox: 250 }, onScanSuccess, onScanError)
-                            .catch(err => console.warn('Could not start camera', err));
-                    });
-                }
-            }).catch(err => console.warn(err));
-        });
-
-        function downloadCSV() {
-            let csv = "Student ID,Name,Class,Status,Date & Time\n";
-            for (let id in attendance) {
-                let row = attendance[id];
-                csv += `${id},${row.name},${row.class},${row.status},${row.time}\n`;
-            }
-            let blob = new Blob([csv], { type: 'text/csv' });
-            let link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "attendance.csv";
-            link.click();
-        }
-            updateTable();
-function onScanSuccess(decodedText) {
-    if (students[decodedText]) {
-        // Play scan success sound
-        document.getElementById("scan-sound").play();
-
-        let student = students[decodedText];
-        let now = new Date();
-        let time = now.toLocaleString();
-        attendance[decodedText] = {
-            name: student.name,
-            class: student.class,
-            status: "Present ✅",
-            time: time
-        };
-        localStorage.setItem("attendance", JSON.stringify(attendance));
-
-        document.getElementById("student-name").innerText = `${student.name} (${student.class})`;
-        document.getElementById("attendance-status").innerHTML = `<span class="status-badge">Present ✅ at ${time}</span>`;
-
-        updateTable();
-    } else {
-        document.getElementById("student-name").innerText = "Unknown QR Code";
-        document.getElementById("attendance-status").innerText = "";
-    }
-}
- // ...existing JS above...
-
-    function clearAttendance() {
-        attendance = {};
-        localStorage.removeItem("attendance");
-        updateTable();
-        document.getElementById("student-name").innerText = "";
-        document.getElementById("attendance-status").innerText = "";
-    }
-
-    // Auto save after 20 minutes (1200000 ms)
-    setTimeout(() => {
-        localStorage.setItem("attendance", JSON.stringify(attendance));
-        alert("Attendance list has been auto-saved.");
-    }, 1200000);
-
-    // ...existing JS below...
-    </script>
-
-<audio id="scan-sound" src="success-221935.mp3" preload="auto"></audio>
-
+  <!-- Scripts -->
+  <script src="AI.js"></script>
 </body>
-</html>
-
-
+</html> 
 
 
 
